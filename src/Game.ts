@@ -5,10 +5,18 @@ class Game {
     private readonly ctx: CanvasRenderingContext2D;
 
     //some global player attributes
-    private readonly player: string = "Gideon";
+    private readonly player: string = "Daddy";
     private readonly score: number = 400;
     private readonly lives: number = 3;
     public highscores: Array<any>; //TODO: do not use 'any': write an interface!
+
+    private leftPressed: boolean;
+    private rightPressed: boolean;
+    private upPressed: boolean;
+    private downPressed: boolean;
+
+    private shipXOffset: number = 50;
+    private shipYOffset: number = 37;
 
     public constructor(canvasId: HTMLCanvasElement) {
         //construct all canvas
@@ -43,18 +51,11 @@ class Game {
         //this.title_screen();
     }
 
-    public writeTextToCanvas(
-        text: string,
-        fontSize: number,
-        xCoordinate: number,
-        yCoordinate: number,
-        color: string = "white",
-        alignment: CanvasTextAlign = "center"
-    ) {
-        this.ctx.font = `${fontSize}px Comic Sans`;
-        this.ctx.fillStyle = color;
-        this.ctx.textAlign = alignment;
-        this.ctx.fillText(text, xCoordinate, yCoordinate);
+
+
+    public clearScreen() {
+        const context = this.canvas.getContext('2d');
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     //-------- Splash screen methods ------------------------------------
@@ -62,6 +63,7 @@ class Game {
      * Function to initialize the splash screen
      */
     public start_screen() {
+        this.clearScreen();
         //1. add 'Asteroids' text
         this.writeAsteroidHeading();
         //2. add 'Press to play' text
@@ -71,15 +73,17 @@ class Game {
         //4. add Asteroid image
         this.drawAsteroid();
     }
+
     public writeAsteroidHeading() {
-        this.writeTextToCanvas("Asteroids", 150, this.canvas.width/2, this.canvas.height/4)
+        this.writeTextToCanvas("Asteroids", 150, this.canvas.width / 2, this.canvas.height / 4)
     }
 
     public writeIntroText() {
-        this.writeTextToCanvas("Press to Play", 50, this.canvas.width/2, this.canvas.height/3*1.7)
+        this.writeTextToCanvas("Press to Play", 50, this.canvas.width / 2, this.canvas.height / 3 * 1.7)
     }
 
     public writeStartButton = () => {
+        let clickLimit = 1
         // Button position and dimensions
         var buttonX = this.canvas.width / 3 * 1.3;
         var buttonY = this.canvas.height * .68 - this.canvas.height * .1 / 2;
@@ -90,7 +94,7 @@ class Game {
         image.addEventListener('load', () => {
             this.ctx.drawImage(image, this.canvas.width / 3 * 1.3, this.canvas.height / 1.6);
             // Render button format
-            this.writeTextToCanvas("Play", 25, this.canvas.width/2, this.canvas.height*.66, "black")
+            this.writeTextToCanvas("Play", 25, this.canvas.width / 2, this.canvas.height * .66, "black")
         });
         image.src = './assets/images/SpaceShooterRedux/PNG/UI/buttonBlue.png';
 
@@ -102,11 +106,15 @@ class Game {
                 event.x > buttonX &&
                 event.x < buttonX + buttonW &&
                 event.y > buttonY &&
-                event.y < buttonY + buttonH
+                event.y < buttonY + buttonH &&
+                clickLimit > 0
             ) {
-                const context = this.canvas.getContext('2d');
-                context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.level_screen()
+                clickLimit--
+                this.level_screen();
+                window.addEventListener("keydown", (event) => this.keyDownHandler(event));
+                window.addEventListener("keyup", (event) => this.keyUpHandler(event));
+
+                window.setInterval(() => this.draw(), 1000 / 30);
             }
         });
     }
@@ -127,10 +135,10 @@ class Game {
     
      */
     public level_screen() {
+        this.clearScreen();
         //3. draw random asteroids
         this.randomAsteroids()
         //4. draw player spaceship
-        this.drawSpaceship()
         //1. load life images
         this.drawLives()
         //2. draw current score
@@ -139,7 +147,7 @@ class Game {
 
     public randomAsteroids() {
         let i = 0
-        while (i <= 100) {
+        while (i <= 500) {
             let meteorNumber = this.randomNumber(1, 4)
             let canvasLocationVer = this.randomNumber(0, this.canvas.height)
             let canvasLocationHor = this.randomNumber(0, this.canvas.width)
@@ -152,14 +160,6 @@ class Game {
         }
     }
 
-    public drawSpaceship() {
-        const imgLife = new Image();
-        imgLife.onload = () => {
-            console.log(this);
-            this.ctx.drawImage(imgLife, this.canvas.width / 2, this.canvas.height / 2);
-        };
-        imgLife.src = './assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png';
-    }
 
     public drawLives() {
         const imgLife = new Image();
@@ -183,7 +183,7 @@ class Game {
     };
 
     public currentScore() {
-        this.writeTextToCanvas(`Score: ${this.score}`, 25, this.canvas.width/1.15, this.canvas.height/25)
+        this.writeTextToCanvas(`${this.player}'s score: ${this.score}`, 25, this.canvas.width / 1.15, this.canvas.height / 25)
     }
 
     //-------- Title screen methods -------------------------------------
@@ -192,6 +192,7 @@ class Game {
     * Function to initialize the title screen   
     */
     public title_screen() {
+        this.clearScreen();
         //1. draw your score
         this.drawScore()
         //2. draw all highscore
@@ -199,19 +200,18 @@ class Game {
     }
 
     public drawScore() {
-        this.writeTextToCanvas(`Your score: ${this.score}`, 50, this.canvas.width/2, this.canvas.height/5)
+        this.writeTextToCanvas(`${this.player}'s score: ${this.score}`, 50, this.canvas.width / 2, this.canvas.height / 5)
     }
 
     public drawHighscores() {
-        this.writeTextToCanvas(`Highscores:`, 50, this.canvas.width/2, this.canvas.height/3)
-        this.writeTextToCanvas(`${this.highscores[0]['playerName']}: ${this.highscores[0]['score']}`, 50, this.canvas.width/2, this.canvas.height/3+50)
-        this.writeTextToCanvas(`${this.highscores[1]['playerName']}: ${this.highscores[1]['score']}`, 50, this.canvas.width/2, this.canvas.height/3+100)
-        this.writeTextToCanvas(`${this.highscores[2]['playerName']}: ${this.highscores[2]['score']}`, 50, this.canvas.width/2, this.canvas.height/3+150)
-        this.writeTextToCanvas(`${this.highscores[3]['playerName']}: ${this.highscores[3]['score']}`, 50, this.canvas.width/2, this.canvas.height/3+200)
+        this.writeTextToCanvas(`Highscores:`, 50, this.canvas.width / 2, this.canvas.height / 3)
+        this.writeTextToCanvas(`${this.highscores[0]['playerName']}: ${this.highscores[0]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 50)
+        this.writeTextToCanvas(`${this.highscores[1]['playerName']}: ${this.highscores[1]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 100)
+        this.writeTextToCanvas(`${this.highscores[2]['playerName']}: ${this.highscores[2]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 150)
+        this.writeTextToCanvas(`${this.highscores[3]['playerName']}: ${this.highscores[3]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 200)
     }
 
     //-------Generic canvas functions ----------------------------------
-
     /**
     * Renders a random number between min and max
     * @param {number} min - minimal time
@@ -219,6 +219,72 @@ class Game {
     */
     public randomNumber(min: number, max: number): number {
         return Math.round(Math.random() * (max - min) + min);
+    }
+
+    public draw() {
+        this.clearScreen();
+
+        if (this.leftPressed) {
+            this.shipXOffset -= 7;
+        }
+        if (this.upPressed) {
+            this.shipYOffset -= 5;
+        }
+        if (this.rightPressed) {
+            this.shipXOffset += 7;
+        }
+        if (this.downPressed) {
+            this.shipYOffset += 5;
+        }
+
+        const imgLife = new Image();
+        imgLife.onload = () => {
+            this.ctx.drawImage(imgLife, this.canvas.width / 2 + this.shipXOffset, this.canvas.height / 2 + this.shipYOffset);
+        };
+        imgLife.src = './assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png';
+    }
+
+    public writeTextToCanvas(
+        text: string,
+        fontSize: number,
+        xCoordinate: number,
+        yCoordinate: number,
+        color: string = "white",
+        alignment: CanvasTextAlign = "center"
+    ) {
+        this.ctx.font = `${fontSize}px Comic Sans`;
+        this.ctx.fillStyle = color;
+        this.ctx.textAlign = alignment;
+        this.ctx.fillText(text, xCoordinate, yCoordinate);
+    }
+
+    private keyDownHandler(event: KeyboardEvent) {
+        if (event.keyCode == 65) {
+            this.leftPressed = true;
+        }
+        if (event.keyCode == 68) {
+            this.rightPressed = true;
+        }
+        if (event.keyCode == 87) {
+            this.upPressed = true;
+        }
+        if (event.keyCode == 83) {
+            this.downPressed = true;
+        }
+    }
+    private keyUpHandler(event: KeyboardEvent) {
+        if (event.keyCode == 65) {
+            this.leftPressed = false;
+        }
+        if (event.keyCode == 68) {
+            this.rightPressed = false;
+        }
+        if (event.keyCode == 87) {
+            this.upPressed = false;
+        }
+        if (event.keyCode == 83) {
+            this.downPressed = false;
+        }
     }
 }
 

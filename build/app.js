@@ -1,9 +1,12 @@
 class Game {
     constructor(canvasId) {
-        this.player = "Gideon";
+        this.player = "Daddy";
         this.score = 400;
         this.lives = 3;
+        this.shipXOffset = 50;
+        this.shipYOffset = 37;
         this.writeStartButton = () => {
+            let clickLimit = 1;
             var buttonX = this.canvas.width / 3 * 1.3;
             var buttonY = this.canvas.height * .68 - this.canvas.height * .1 / 2;
             var buttonW = this.canvas.width * 0.145;
@@ -18,10 +21,13 @@ class Game {
                 if (event.x > buttonX &&
                     event.x < buttonX + buttonW &&
                     event.y > buttonY &&
-                    event.y < buttonY + buttonH) {
-                    const context = this.canvas.getContext('2d');
-                    context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    event.y < buttonY + buttonH &&
+                    clickLimit > 0) {
+                    clickLimit--;
                     this.level_screen();
+                    window.addEventListener("keydown", (event) => this.keyDownHandler(event));
+                    window.addEventListener("keyup", (event) => this.keyUpHandler(event));
+                    window.setInterval(() => this.draw(), 1000 / 30);
                 }
             });
         };
@@ -49,13 +55,12 @@ class Game {
         ];
         this.start_screen();
     }
-    writeTextToCanvas(text, fontSize, xCoordinate, yCoordinate, color = "white", alignment = "center") {
-        this.ctx.font = `${fontSize}px Comic Sans`;
-        this.ctx.fillStyle = color;
-        this.ctx.textAlign = alignment;
-        this.ctx.fillText(text, xCoordinate, yCoordinate);
+    clearScreen() {
+        const context = this.canvas.getContext('2d');
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     start_screen() {
+        this.clearScreen();
         this.writeAsteroidHeading();
         this.writeIntroText();
         this.writeStartButton();
@@ -77,14 +82,14 @@ class Game {
     }
     ;
     level_screen() {
+        this.clearScreen();
         this.randomAsteroids();
-        this.drawSpaceship();
         this.drawLives();
         this.currentScore();
     }
     randomAsteroids() {
         let i = 0;
-        while (i <= 100) {
+        while (i <= 500) {
             let meteorNumber = this.randomNumber(1, 4);
             let canvasLocationVer = this.randomNumber(0, this.canvas.height);
             let canvasLocationHor = this.randomNumber(0, this.canvas.width);
@@ -95,14 +100,6 @@ class Game {
             asteroid.src = `./assets/images/SpaceShooterRedux/PNG/Meteors/MeteorBrown_big${meteorNumber}.png`;
             i++;
         }
-    }
-    drawSpaceship() {
-        const imgLife = new Image();
-        imgLife.onload = () => {
-            console.log(this);
-            this.ctx.drawImage(imgLife, this.canvas.width / 2, this.canvas.height / 2);
-        };
-        imgLife.src = './assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png';
     }
     drawLives() {
         const imgLife = new Image();
@@ -126,14 +123,15 @@ class Game {
     }
     ;
     currentScore() {
-        this.writeTextToCanvas(`Score: ${this.score}`, 25, this.canvas.width / 1.15, this.canvas.height / 25);
+        this.writeTextToCanvas(`${this.player}'s score: ${this.score}`, 25, this.canvas.width / 1.15, this.canvas.height / 25);
     }
     title_screen() {
+        this.clearScreen();
         this.drawScore();
         this.drawHighscores();
     }
     drawScore() {
-        this.writeTextToCanvas(`Your score: ${this.score}`, 50, this.canvas.width / 2, this.canvas.height / 5);
+        this.writeTextToCanvas(`${this.player}'s score: ${this.score}`, 50, this.canvas.width / 2, this.canvas.height / 5);
     }
     drawHighscores() {
         this.writeTextToCanvas(`Highscores:`, 50, this.canvas.width / 2, this.canvas.height / 3);
@@ -144,6 +142,60 @@ class Game {
     }
     randomNumber(min, max) {
         return Math.round(Math.random() * (max - min) + min);
+    }
+    draw() {
+        this.clearScreen();
+        if (this.leftPressed) {
+            this.shipXOffset -= 7;
+        }
+        if (this.upPressed) {
+            this.shipYOffset -= 5;
+        }
+        if (this.rightPressed) {
+            this.shipXOffset += 7;
+        }
+        if (this.downPressed) {
+            this.shipYOffset += 5;
+        }
+        const imgLife = new Image();
+        imgLife.onload = () => {
+            this.ctx.drawImage(imgLife, this.canvas.width / 2 + this.shipXOffset, this.canvas.height / 2 + this.shipYOffset);
+        };
+        imgLife.src = './assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png';
+    }
+    writeTextToCanvas(text, fontSize, xCoordinate, yCoordinate, color = "white", alignment = "center") {
+        this.ctx.font = `${fontSize}px Comic Sans`;
+        this.ctx.fillStyle = color;
+        this.ctx.textAlign = alignment;
+        this.ctx.fillText(text, xCoordinate, yCoordinate);
+    }
+    keyDownHandler(event) {
+        if (event.keyCode == 65) {
+            this.leftPressed = true;
+        }
+        if (event.keyCode == 68) {
+            this.rightPressed = true;
+        }
+        if (event.keyCode == 87) {
+            this.upPressed = true;
+        }
+        if (event.keyCode == 83) {
+            this.downPressed = true;
+        }
+    }
+    keyUpHandler(event) {
+        if (event.keyCode == 65) {
+            this.leftPressed = false;
+        }
+        if (event.keyCode == 68) {
+            this.rightPressed = false;
+        }
+        if (event.keyCode == 87) {
+            this.upPressed = false;
+        }
+        if (event.keyCode == 83) {
+            this.downPressed = false;
+        }
     }
 }
 let init = function () {
