@@ -19,6 +19,9 @@ class CanvasHelper {
         this.downKeyPressed = false;
         this.shipXOffset = 50;
         this.shipYOffset = 37;
+        this.player = "Placeholdername";
+        this.score = 400;
+        this.lives = 3;
         this.loadMenuView = function () {
             const Asteroids = new MenuView(document.getElementById('canvas'));
             Asteroids;
@@ -103,7 +106,7 @@ class CanvasHelper {
             './assets/images/SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny1.png',
             './assets/images/SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny2.png'
         ];
-        this.lives = [
+        this.livesArray = [
             './assets/images/SpaceShooterRedux/PNG/UI/playerLife2_blue.png',
             './assets/images/SpaceShooterRedux/PNG/UI/playerLife2_green.png',
             './assets/images/SpaceShooterRedux/PNG/UI/playerLife2_orange.png',
@@ -157,16 +160,16 @@ class CanvasHelper {
         const horizontalCenter = this.GetWidth() / 2;
         const verticalCenter = this.GetHeight() / 2;
         if (this.leftKeyPressed) {
-            this.shipXOffset += 2;
+            this.shipXOffset += 5;
         }
         if (this.upKeyPressed) {
-            this.shipYOffset += 2;
+            this.shipYOffset += 5;
         }
         if (this.rightKeyPressed) {
-            this.shipXOffset -= 2;
+            this.shipXOffset -= 5;
         }
         if (this.downKeyPressed) {
-            this.shipYOffset -= 2;
+            this.shipYOffset -= 5;
         }
         this.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", horizontalCenter - this.shipXOffset, verticalCenter - this.shipYOffset);
     }
@@ -204,6 +207,10 @@ class CanvasHelper {
             this.downKeyPressed = false;
         }
     }
+    namePrompt() {
+        var sign = prompt("What's your username?");
+        this.player = sign;
+    }
 }
 class MathHelper {
     static randomNumber(min, max) {
@@ -211,24 +218,21 @@ class MathHelper {
     }
 }
 class GameView extends ViewBase {
-    constructor(aCanvas) {
-        super(aCanvas);
-        this.player = "knuckles";
-        this.score = 400;
-        this.lives = 3;
-        this.gameScreen();
-        console.log("game");
-    }
     static drawLives() {
         throw new Error("Method not implemented.");
     }
     static displayScore() {
         throw new Error("Method not implemented.");
     }
+    constructor(aCanvas) {
+        super(aCanvas);
+        this.gameScreen();
+    }
     renderScreen() {
     }
     OnClick() { }
     gameScreen() {
+        this.d_CanvasHelper.namePrompt();
         this.drawAsteroids();
         this.drawLives();
         this.displayScore();
@@ -242,10 +246,10 @@ class GameView extends ViewBase {
         }
     }
     drawLives() {
-        this.d_CanvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", -30, 10, 40, undefined, this.lives);
+        this.d_CanvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", -30, 10, 40, undefined, this.d_CanvasHelper.lives);
     }
     displayScore() {
-        this.d_CanvasHelper.writeTextToCanvas(`${this.player}'s Score: ${this.score}`, 25, this.d_CanvasHelper.GetWidth() / 1.12, this.d_CanvasHelper.GetHeight() / 25);
+        this.d_CanvasHelper.writeTextToCanvas(`${this.d_CanvasHelper.player}'s Score: ${this.d_CanvasHelper.score}`, 25, this.d_CanvasHelper.GetWidth() / 1.12, this.d_CanvasHelper.GetHeight() / 25);
     }
 }
 let init = function () {
@@ -290,6 +294,10 @@ class ScoreView extends ViewBase {
                 score: 99999999
             },
             {
+                playerName: this.d_CanvasHelper.player,
+                score: this.d_CanvasHelper.score
+            },
+            {
                 playerName: 'Loek',
                 score: 40000
             },
@@ -308,11 +316,12 @@ class ScoreView extends ViewBase {
         this.drawHighscores();
     }
     drawHighscores() {
-        this.d_CanvasHelper.writeTextToCanvas(`Highscores:`, 50, this.canvas.width / 2, this.canvas.height / 3);
-        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[0]['playerName']}: ${this.highscores[0]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 50);
-        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[1]['playerName']}: ${this.highscores[1]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 100);
-        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[2]['playerName']}: ${this.highscores[2]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 150);
-        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[3]['playerName']}: ${this.highscores[3]['score']}`, 50, this.canvas.width / 2, this.canvas.height / 3 + 200);
+        this.d_CanvasHelper.writeTextToCanvas(`Highscores:`, 50, this.d_CanvasHelper.GetWidth() / 2, this.d_CanvasHelper.GetHeight() / 3);
+        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[0]['playerName']}: ${this.highscores[0]['score']}`, 50, this.d_CanvasHelper.GetWidth() / 2, this.d_CanvasHelper.GetHeight() / 3 + 50);
+        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[1]['playerName']}: ${this.highscores[1]['score']}`, 50, this.d_CanvasHelper.GetWidth() / 2, this.d_CanvasHelper.GetHeight() / 3 + 100);
+        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[2]['playerName']}: ${this.highscores[2]['score']}`, 50, this.d_CanvasHelper.GetWidth() / 2, this.d_CanvasHelper.GetHeight() / 3 + 150);
+        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[3]['playerName']}: ${this.highscores[3]['score']}`, 50, this.d_CanvasHelper.GetWidth() / 2, this.d_CanvasHelper.GetHeight() / 3 + 200);
+        this.d_CanvasHelper.writeTextToCanvas(`${this.highscores[4]['playerName']}: ${this.highscores[4]['score']}`, 50, this.d_CanvasHelper.GetWidth() / 2, this.d_CanvasHelper.GetHeight() / 3 + 250);
     }
     renderScreen() {
     }

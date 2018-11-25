@@ -3,13 +3,16 @@ class CanvasHelper {
     protected readonly ctx: CanvasRenderingContext2D;
     public highscores: Array<any>
     public meteors: Array<any>
-    public lives: Array<any>
+    public livesArray: Array<any>
     private leftKeyPressed: boolean = false;
     private upKeyPressed: boolean = false;
     private rightKeyPressed: boolean = false;
     private downKeyPressed: boolean = false;
     private shipXOffset: number = 50;
     private shipYOffset: number = 37;
+    public player: string = "Placeholdername"
+    public score: number = 400;
+    public lives: number = 3;
 
     public constructor(aCanvas: HTMLCanvasElement) {
         //console.log("Constructor CanvasHelper")
@@ -57,7 +60,7 @@ class CanvasHelper {
             './assets/images/SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny1.png',
             './assets/images/SpaceShooterRedux/PNG/Meteors/meteorGrey_tiny2.png'
         ]
-        this.lives = [
+        this.livesArray = [
             './assets/images/SpaceShooterRedux/PNG/UI/playerLife2_blue.png',
             './assets/images/SpaceShooterRedux/PNG/UI/playerLife2_green.png',
             './assets/images/SpaceShooterRedux/PNG/UI/playerLife2_orange.png',
@@ -192,16 +195,16 @@ class CanvasHelper {
         const verticalCenter = this.GetHeight() / 2;
 
         if (this.leftKeyPressed) {
-            this.shipXOffset += 2;
+            this.shipXOffset += 5;
         }
         if (this.upKeyPressed) {
-            this.shipYOffset += 2;
+            this.shipYOffset += 5;
         }
         if (this.rightKeyPressed) {
-            this.shipXOffset -= 2;
+            this.shipXOffset -= 5;
         }
         if (this.downKeyPressed) {
-            this.shipYOffset -= 2;
+            this.shipYOffset -= 5;
         }
 
         //4. draw player spaceship
@@ -246,5 +249,9 @@ class CanvasHelper {
         if (event.keyCode == 83 || event.keyCode == 40) {
             this.downKeyPressed = false;
         }
+    }
+    public namePrompt() {
+        var sign = prompt("What's your username?");
+        this.player = sign
     }
 }

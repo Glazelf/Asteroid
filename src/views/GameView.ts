@@ -8,17 +8,14 @@ class GameView extends ViewBase {
     public constructor(aCanvas: HTMLCanvasElement) {
         super(aCanvas)
         this.gameScreen()
-        console.log("game")
+        //console.log("game")
     }
-    private readonly player: string = "knuckles";
-    private readonly score: number = 400;
-    private readonly lives: number = 3;
-
     protected renderScreen(): void {
 
     }
     protected OnClick() { }
     public gameScreen() {
+        this.d_CanvasHelper.namePrompt()
         //3. draw random asteroids
         this.drawAsteroids()
         //4. draw player spaceship
@@ -42,9 +39,9 @@ class GameView extends ViewBase {
         }
     }
     protected drawLives() {
-        this.d_CanvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", -30, 10, 40, undefined, this.lives);
+        this.d_CanvasHelper.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/UI/playerLife1_blue.png", -30, 10, 40, undefined, this.d_CanvasHelper.lives);
     }
     protected displayScore() {
-        this.d_CanvasHelper.writeTextToCanvas(`${this.player}'s Score: ${this.score}`, 25, this.d_CanvasHelper.GetWidth() / 1.12, this.d_CanvasHelper.GetHeight() / 25)
+        this.d_CanvasHelper.writeTextToCanvas(`${this.d_CanvasHelper.player}'s Score: ${this.d_CanvasHelper.score}`, 25, this.d_CanvasHelper.GetWidth() / 1.12, this.d_CanvasHelper.GetHeight() / 25)
     }
 }
