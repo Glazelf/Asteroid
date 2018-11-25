@@ -19,7 +19,7 @@ class CanvasHelper {
         this.downKeyPressed = false;
         this.shipXOffset = 50;
         this.shipYOffset = 37;
-        this.player = "Placeholdername";
+        this.player = "Placeholder";
         this.score = 400;
         this.lives = 3;
         this.loadMenuView = function () {
@@ -56,6 +56,7 @@ class CanvasHelper {
                     this.clearScreen();
                     document.body.style.cursor = "wait";
                     this.loadGameView();
+                    this.namePrompt();
                     window.addEventListener("keydown", (event) => this.keyDownHandler(event));
                     window.addEventListener("keyup", (event) => this.keyUpHandler(event));
                     window.setInterval(() => this.drawShip(), 1000 / 30);
@@ -70,6 +71,10 @@ class CanvasHelper {
             {
                 playerName: 'Gideon',
                 score: 9999999999
+            },
+            {
+                playerName: this.player,
+                score: this.score
             },
             {
                 playerName: 'Loek',
@@ -150,26 +155,27 @@ class CanvasHelper {
         });
     }
     clearShip() {
-        const horizontalCenter = this.GetWidth() / 2;
-        const verticalCenter = this.GetHeight() / 2;
-        const context = this.canvas.getContext('2d');
-        context.clearRect(horizontalCenter - this.shipXOffset, verticalCenter - this.shipYOffset, horizontalCenter - this.shipXOffset - 112, verticalCenter - this.shipYOffset - 75);
+        this.clearScreen();
+        this.loadGameView();
     }
     drawShip() {
-        this.clearShip();
         const horizontalCenter = this.GetWidth() / 2;
         const verticalCenter = this.GetHeight() / 2;
-        if (this.leftKeyPressed) {
+        if (this.leftKeyPressed && this.shipXOffset < this.GetWidth() / 2) {
             this.shipXOffset += 5;
+            this.clearShip();
         }
-        if (this.upKeyPressed) {
+        if (this.upKeyPressed && this.shipYOffset < this.GetHeight() / 2) {
             this.shipYOffset += 5;
+            this.clearShip();
         }
-        if (this.rightKeyPressed) {
+        if (this.rightKeyPressed && this.shipXOffset + this.GetWidth() / 2 - 100 > 0) {
             this.shipXOffset -= 5;
+            this.clearShip();
         }
-        if (this.downKeyPressed) {
+        if (this.downKeyPressed && this.shipYOffset + this.GetHeight() / 2 - 75 > 0) {
             this.shipYOffset -= 5;
+            this.clearShip();
         }
         this.writeImageToCanvas("./assets/images/SpaceShooterRedux/PNG/playerShip1_blue.png", horizontalCenter - this.shipXOffset, verticalCenter - this.shipYOffset);
     }
@@ -208,8 +214,11 @@ class CanvasHelper {
         }
     }
     namePrompt() {
-        var sign = prompt("What's your username?");
-        this.player = sign;
+        if (this.player = "Placeholder") {
+            var sign = prompt("What's your username?");
+            this.player = sign;
+            console.log(sign);
+        }
     }
 }
 class MathHelper {
@@ -232,7 +241,6 @@ class GameView extends ViewBase {
     }
     OnClick() { }
     gameScreen() {
-        this.d_CanvasHelper.namePrompt();
         this.drawAsteroids();
         this.drawLives();
         this.displayScore();
@@ -288,28 +296,6 @@ class MenuView extends ViewBase {
 class ScoreView extends ViewBase {
     constructor(aCanvas) {
         super(aCanvas);
-        this.highscores = [
-            {
-                playerName: 'Gideon',
-                score: 99999999
-            },
-            {
-                playerName: this.d_CanvasHelper.player,
-                score: this.d_CanvasHelper.score
-            },
-            {
-                playerName: 'Loek',
-                score: 40000
-            },
-            {
-                playerName: 'Daan',
-                score: 34000
-            },
-            {
-                playerName: 'Rimmert',
-                score: 200
-            }
-        ];
         this.scoreView();
     }
     scoreView() {

@@ -10,7 +10,7 @@ class CanvasHelper {
     private downKeyPressed: boolean = false;
     private shipXOffset: number = 50;
     private shipYOffset: number = 37;
-    public player: string = "Placeholdername"
+    public player: string = "Placeholder"
     public score: number = 400;
     public lives: number = 3;
 
@@ -24,6 +24,10 @@ class CanvasHelper {
             {
                 playerName: 'Gideon',
                 score: 9999999999
+            },
+            {
+                playerName: this.player,
+                score: this.score
             },
             {
                 playerName: 'Loek',
@@ -168,6 +172,7 @@ class CanvasHelper {
                 this.clearScreen()
                 document.body.style.cursor = "wait";
                 this.loadGameView()
+                this.namePrompt()
                 window.addEventListener("keydown", (event) => this.keyDownHandler(event));
                 window.addEventListener("keyup", (event) => this.keyUpHandler(event));
                 window.setInterval(() => this.drawShip(), 1000 / 30);
@@ -183,28 +188,28 @@ class CanvasHelper {
     }
 
     private clearShip() {
-        //cleart ~75% van de canvas naar rechts en naar onder??
-        const horizontalCenter = this.GetWidth() / 2;
-        const verticalCenter = this.GetHeight() / 2;
-        const context = this.canvas.getContext('2d');
-        context.clearRect(horizontalCenter - this.shipXOffset, verticalCenter - this.shipYOffset, horizontalCenter - this.shipXOffset - 112, verticalCenter - this.shipYOffset - 75);
+        this.clearScreen()
+        this.loadGameView()
     }
     private drawShip() {
-        this.clearShip()
         const horizontalCenter = this.GetWidth() / 2;
         const verticalCenter = this.GetHeight() / 2;
 
-        if (this.leftKeyPressed) {
+        if (this.leftKeyPressed && this.shipXOffset<this.GetWidth()/2) {
             this.shipXOffset += 5;
+            this.clearShip()
         }
-        if (this.upKeyPressed) {
+        if (this.upKeyPressed && this.shipYOffset<this.GetHeight()/2) {
             this.shipYOffset += 5;
+            this.clearShip()
         }
-        if (this.rightKeyPressed) {
+        if (this.rightKeyPressed && this.shipXOffset+this.GetWidth()/2-100>0) {
             this.shipXOffset -= 5;
+            this.clearShip()
         }
-        if (this.downKeyPressed) {
+        if (this.downKeyPressed && this.shipYOffset+this.GetHeight()/2-75>0) {
             this.shipYOffset -= 5;
+            this.clearShip()
         }
 
         //4. draw player spaceship
@@ -251,7 +256,10 @@ class CanvasHelper {
         }
     }
     public namePrompt() {
+        if (this.player = "Placeholder"){
         var sign = prompt("What's your username?");
         this.player = sign
+        console.log(sign)
+        }
     }
 }

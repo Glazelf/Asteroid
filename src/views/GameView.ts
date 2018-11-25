@@ -15,7 +15,6 @@ class GameView extends ViewBase {
     }
     protected OnClick() { }
     public gameScreen() {
-        this.d_CanvasHelper.namePrompt()
         //3. draw random asteroids
         this.drawAsteroids()
         //4. draw player spaceship
