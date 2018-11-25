@@ -11,7 +11,7 @@ class CanvasHelper {
     private shipXOffset: number = 50;
     private shipYOffset: number = 37;
     public player: string = "Placeholder"
-    public score: number = 400;
+    public score: number = 10000;
     public lives: number = 3;
 
     public constructor(aCanvas: HTMLCanvasElement) {
@@ -168,11 +168,11 @@ class CanvasHelper {
                 event.y < buttonY + buttonH &&
                 clickLimit > 0
             ) {
+                this.namePrompt()
                 clickLimit--
                 this.clearScreen()
                 document.body.style.cursor = "wait";
                 this.loadGameView()
-                this.namePrompt()
                 window.addEventListener("keydown", (event) => this.keyDownHandler(event));
                 window.addEventListener("keyup", (event) => this.keyUpHandler(event));
                 window.setInterval(() => this.drawShip(), 1000 / 30);
