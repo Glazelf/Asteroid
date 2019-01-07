@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Minecraft';
     src: url('../fonts/Minecraft.ttf') format('truetype');
-};
+}
 
 canvas{
     font-family: 'Minecraft';
@@ -9,8 +9,8 @@ canvas{
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
-};
+}
 
 body{
-    overflow: hidden;
-};
+    overflow: hidden
+}
